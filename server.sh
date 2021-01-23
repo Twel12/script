@@ -167,6 +167,10 @@ echo -e "\033[01;31m\n--------------------- Post Created ^_^ -------------------
 # Upload Test Build
 function PostTEST() {
     rsync -Ph out/target/product/davinci/PixelOS*zip twel12@frs.sourceforge.net:/home/frs/project/pixelosdavinci/TestBuilds/
+telegram -c @CatPower12 -M "Test Build Successfully Completed for PixelOS
+
+*Android Version*: 11
+*Time Taken For Build*: $timefinal"
 bash ~/telegram.sh/telegram -c -1001490386589 -M "#PixelOS #Android11 #Davinci #TestBuild
 *PixelOS | Android 11*
 UPDATE DATE - $update_date
