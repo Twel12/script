@@ -7,7 +7,7 @@ echo -e "\e[36m\e[1m---------------------------PixelOS Script By Twel12---------
 
 # Some Useful Stuff
 ota=$(date +"%s")
-update_date=$(date +'%d %B %Y')
+update_date=`date '+%Y-%m-%d'`
 LOCAL_PATH="$(pwd)"
 
 # Telegram
@@ -25,10 +25,10 @@ if [[ $exit_code != 0 ]]; then
 	if [[ $1 != "" ]]; then
 		echo "$1"
 		echo "Exiting with status $exit_code"
-		telegram -c @CatPower12 "Build Failed at $timefinal"
+		telegram -c @twelspam "Build Failed at $timefinal"
 	else
 		echo "An error was detected, exiting"
-		telegram -c @CatPower12 "An Error Was Detected Build Failed at $timefinal"
+		telegram -c @twelspam "An Error Was Detected Build Failed at $timefinal"
 	fi
 	exit $exit_code
 fi
@@ -129,7 +129,6 @@ function envsetup() {
         envsetup
     fi
     echo -e "\033[01;33m\n---------------- Setting up build environment ---------------- \033[0m"
-    ccache -M 70G
     export USE_CCACHE=1
     export CCACHE_EXEC=$(command -v ccache)
     export CUSTOM_BUILD_TYPE=OFFICIAL
@@ -149,15 +148,14 @@ function sourceforgeOTA() {
 
 function POSTOTA() {
 bash ~/telegram.sh/telegram -i ~/telegram.sh/hello.jpg -c @fake_twel12 -M "#PixelOS #Android11 #Davinci #OTAUpdate
-
 *PixelOS | Android 11*
-UPDATE DATE - _ $update_date _
+*Updated* - $update_date
 
 ▪️ [Download]("$DownloadLINK")
 ▪️ [Chat](t.me/CatPower12)
 ▪️ [Changelog](https://raw.githubusercontent.com/PixelOS-and-Not-So-Pixel/OTA-Devices/eleven/davinci_changelogs.txt)
-*Built By* [Twel12]("t.me/real_twel12")
 
+*Built By* [Twel12]("t.me/real_twel12") && [maade]("t.me/maade69")
 *Follow* @RedmiK20Updates
 *Join* @RedmiK20GlobalOfficial"
 telegram -c @CatPower12 -M "Builds take _15-20_ mins To Appear As Sourceforge is slow, Please be *patient*."
@@ -167,11 +165,11 @@ echo -e "\033[01;31m\n--------------------- Post Created ^_^ -------------------
 # Upload Test Build
 function PostTEST() {
     rsync -Ph out/target/product/davinci/PixelOS*zip twel12@frs.sourceforge.net:/home/frs/project/pixelosdavinci/TestBuilds/
-telegram -c @CatPower12 -M "Test Build Successfully Completed for PixelOS
+telegram -c  -M "Test Build Successfully Completed for PixelOS
 
 *Android Version*: 11
 *Time Taken For Build*: $timefinal"
-bash ~/telegram.sh/telegram -c -1001490386589 -M "#PixelOS #Android11 #Davinci #TestBuild
+bash ~/telegram.sh/telegram -c @twelspam -M "#PixelOS #Android11 #Davinci #TestBuild
 *PixelOS | Android 11*
 UPDATE DATE - $update_date
 
@@ -185,8 +183,8 @@ UPDATE DATE - $update_date
 # OTA Full Zip
 function OTA() {
     echo -e "\e[36m\e[1m---------------------------Automatic OTA FULL PACKAGE UPDATE---------------------------"
-echo -e "{\"error\":true,\"maintainers\":[{\"main_maintainer\":false,\"github_username\":\"Twel12\",\"name\":\"Twel12\"}],\"donate_url\":\"\",\"website_url\":\"https://sourceforge.net/projects/pixelosdavinci/files/PixelOS_Davinci/\",\"datetime\":1608565724,\"filename\": \"$NAME\",\"id\": \"$md5\",\"size\":$FILESIZE ,\"url\":\"$DownloadLINK\",\"version\": \"eleven\",\"filehash\":\"$md5\",\"is_incremental\":false,\"has_incremental\":false}" > /home/shivansh/OTA/davinci.json
-cd /home/shivansh/OTA
+echo -e "{\"error\":false,\"maintainers\":[{\"main_maintainer\":false,\"github_username\":\"Twel12\",\"name\":\"Twel12\"}],\"donate_url\":\"\",\"website_url\":\"https://sourceforge.net/projects/pixelosdavinci/files/PixelOS_Davinci/\",\"datetime\":1608565724,\"filename\": \"$NAME\",\"id\": \"$md5\",\"size\":$FILESIZE ,\"url\":\"$DownloadLINK\",\"version\": \"eleven\",\"filehash\":\"$md5\",\"is_incremental\":false,\"has_incremental\":false}" > /home/twel12/OTA/davinci.json
+cd /home/twel12/OTA
 git add .
 git commit -m "Automatic OTA update"
 git push git@github.com:PixelOS-and-Not-So-Pixel/OTA-Devices.git HEAD:eleven -f
@@ -239,13 +237,13 @@ function build() {
 
     if [[ $choice_build == *"1"* ]] || [[ $choice_build == *"2"* ]]; then
         echo -e "\033[01;33m\n---------------------------Starting Test Build (*^_^*)--------------------------- \033[0m"
-        telegram -c @CatPower12 -M "Build Compilation Started for PixelOS
+        telegram -c @twelspam -M "Build Compilation Started for PixelOS
 
 *Android Version*: 11
 *Build Type*: Test
 *Starting Time*: $(date)"
         buildbacon
-        telegram -c @CatPower12 -M "Test Build Successfully Completed for PixelOS
+        telegram -c @twelspam -M "Test Build Successfully Completed for PixelOS
 
 *Android Version*: 11
 *Time Taken For Build*: $timefinal"
