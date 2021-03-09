@@ -2,18 +2,18 @@
 
 ## Usage:
 ```bash
-# create a folder to hold source code
-mkdir PixelOS
+
+mkdir PixelOS # create a folder to hold source code
+
 cd PixelOS
 
-# clone build_scripts into aosp
-git clone https://github.com/PixelOS-and-Not-So-Pixel/script.git script
+git clone https://github.com/Twel12/script.git # clone build_scripts into the folder
 
-# run build scripts
-bash script/server.sh
+
+bash script/server.sh # run build scripts
 ```
 
-## Links:
+## Device Specefic Links:
 ```bash
 # device
 https://github.com/Twel12/device-xiaomi-davinci
@@ -24,3 +24,6 @@ https://github.com/Twel12/android_kernel_xiaomi_sm6150
 # vendor
 https://github.com/Twel12/proprietary_vendor_xiaomi_davinci
 ```
+
+## Repo I use for telegram Commands:
+https://github.com/fabianonline/telegram.sh
