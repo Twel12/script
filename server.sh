@@ -6,11 +6,29 @@ export LC_ALL=C
 echo -e "\e[36m\e[1m---------------------------Random Script By Twel12---------------------------"
 
 # Some Useful Stuff
-ota=$(date +"%s")
 server=$USER
 update_date=`date '+%Y-%m-%d'`
 LOCAL_PATH="$(pwd)"
 telegramMSG=1 #Enable Message By Default Unlike for test builds
+
+# Some Check For First Times
+function firsttime() {
+    echo "Performing Some Tests before running scripts"
+    if stat --printf='' /home/$server/OTA 2>/dev/null; then
+        echo "OTA Folder Check Complete."
+    else
+        echo -e "\033[01;31m\n Failed Finding OTA Folder \n "
+        echo "Cloning OTA Folder"
+        git clone https://github.com/PixelOS-Pixelish/OTA-Devices /home/$server/OTA
+    fi
+
+    if stat --printf='' /home/$server/telegram.sh 2>/dev/null; then
+        echo "telegram script check complete"
+    else
+        echo -e "\033[01;31m\n Failed Finding Telegram Folder 033[0m"
+        git clone https://github.com/Twel12/telegram.sh /home/$server/telegram.sh
+    fi
+}
 
 # Telegram
 telegram () {
@@ -21,20 +39,6 @@ fi
 
 # Function to Check Error and Upload Build Log in case build fails
 function build_error() {
-if [[ $exitcodez != 0 ]]; then
-	if [[ $1 != "" ]]; then
-		echo "$1"
-		echo "Exiting with status $exitcodez"
-		telegram -c "-1001349538519" -f log.txt "Build Failed at $timefinal"
-	else
-		echo "An error was detected, exiting"
-		telegram -c "-1001349538519" -f log.txt "An Error Was Detected Build Failed at $timefinal"
-	fi
-	exit $exitcodez
-fi
-}
-
-function script_error2() {
 if [[ $exitcodez != 0 ]]; then
 	if [[ $1 != "" ]]; then
 		echo "$1"
@@ -63,10 +67,10 @@ fi
 
 # Time
 function timechange() {
- hr=$(bc <<< "${1}/3600")
- min=$(bc <<< "(${1}%3600)/60")
- sec=$(bc <<< "${1}%60")
- printf "%02dHours, %02dMintues, %02dSeconds\n" $hr $min $sec
+    hr=$(bc <<< "${1}/3600")
+    min=$(bc <<< "(${1}%3600)/60")
+    sec=$(bc <<< "${1}%60")
+    printf "%02dHours, %02dMintues, %02dSeconds\n" $hr $min $sec
 }
 
 # Place Local Manifest in Place
@@ -79,7 +83,7 @@ function init_local_repo() {
 # Initialize Pixel OS repository
 function init_main_repo() {
     echo -e "\033[01;33m\nInit main repo... \033[0m"
-    repo init -u https://github.com/PixelOS-and-Not-So-Pixel/manifest -b eleven
+    repo init -u https://github.com/PixelOS-Pixelish/manifest -b $branch --depth=1
 }
 
 # Start Sycing Repo
@@ -88,7 +92,7 @@ function sync_repo() {
     repo sync -c -q --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j$(nproc --all) #SAVETIME
 }
 
-# Apply Patches
+# Apply Patches (by @Raysenlau)
 function apply_patches() {
     echo -e "\033[01;33m\nApplying patches... \033[0m"
     patches="$(readlink -f -- $1)"
@@ -150,7 +154,7 @@ function envsetup() {
     . build/envsetup.sh
     lunch aosp_davinci-$buildtype
     script_error
-    #make installclean
+    make installclean
 }
 
 # start build and store time taken
@@ -172,36 +176,40 @@ function startbuild(){
 # Upload OTA build to sourceforge
 function SourceforgeOTA() {
     echo -e "\033[01;33m\n-------------- Uploading Build to SourceForge -------------- \033[0m"
-    rsync -Ph $Package twel12@frs.sourceforge.net:/home/frs/project/pixelos-notsopixel/Pixel_OS/Davinci/
+    rsync -Ph $Package twel12@frs.sourceforge.net:/home/frs/project/pixelos-notsopixel/$path/Davinci/
     echo -e "\033[01;31m\n-------------------- Upload Completed --------------------\033[0m"
 }
 
-# test build updates
+# Test build updates
 function testbuild(){
-    telegram -c "-1001349538519" -M "Build Compilation Started for PixelOS
+    telegram -c "-1001349538519" -M "Build Compilation Started for $rom
 
-*Android Version*: 11
 *Host*: $server
 *Build Type*: Test
 *Starting Time*: $(date)"
         buildbacon
-        telegram -c "-1001349538519" -M "Test Build Successfully Completed for PixelOS
+        telegram -c "-1001349538519" -M "Test Build Successfully Completed for $rom
 
-*Android Version*: 11
 *Time Taken For Build*: $timefinal"
+}
+
+#Gdrive Upload
+function Google(){
+    export link=$(gdrive upload --share out/target/product/davinci/Pixel*.zip | awk '/File is/ {print $NF}') #thanks to @maade69 for simplifying logic
 }
 
 # Make Post for Release build
 function TelegramOTA() {
-bash ~/telegram.sh/telegram -i ~/telegram.sh/hello.jpg -c @fake_twel12 -M "#PixelOS #Android11 #Davinci #OTAUpdate
-*PixelOS | Android 11*
-*Updated* - $update_date
+    Google
+    bash ~/telegram.sh/telegram -i ~/telegram.sh/$rom.jpg -c @fake_twel12 -M "#$rom #Android11 #Davinci #OTAUpdate
+*$rom | Android 11.*
+*Updated:* _ $update_date  _
 
-▪️ [Download]("$DownloadLINK")
-▪️ [Chat](t.me/CatPower12)
-▪️ [Changelog](https://raw.githubusercontent.com/PixelOS-and-Not-So-Pixel/OTA-Devices/eleven/davinci_changelogs.txt)
+▪️ [Download]("$DownloadLINK") | [Mirror]("$link")
+▪️ [Changelog](https://raw.githubusercontent.com/PixelOS-Pixelish/OTA-Devices/$branch/davinci_changelogs.txt)
+▪️ [Support](t.me/CatPower12)
 
-*Built By* [Twel12]("t.me/real_twel12")
+*By* [Twel12]("t.me/real_twel12")
 *Follow* @RedmiK20Updates
 *Join* @RedmiK20GlobalOfficial"
 telegram -c @CatPower12 -M "Builds take _15-20_ mins To Appear As Sourceforge is slow, Please be *patient*."
@@ -210,66 +218,53 @@ echo -e "\033[01;31m\n--------------------- Post Created ^_^ -------------------
 
 # Upload Test Build
 function TelegramTestPost() {
-    rsync -Ph out/target/product/davinci/PixelOS*zip twel12@frs.sourceforge.net:/home/frs/project/pixelosdavinci/TestBuilds/
-telegram -c  -M "Test Build Successfully Completed for PixelOS
-
-*Android Version*: 11
-*Time Taken For Build*: $timefinal"
-bash ~/telegram.sh/teleexport exitcodez=$?gram -c "-1001349538519" -M "#PixelOS #Android11 #Davinci #TestBuild
-*PixelOS | Android 11*
+    Google
+bash ~/telegram.sh/telegram -c -1001349538519 -M "#$rom #Android11 #Davinci #TestBuild
+*$rom | Android 11*
 UPDATE DATE - $update_date
 
 *This is a Test Build*
-> [Download (Sourceforge)]("https://sourceforge.net/projects/pixelosdavinci/files/TestBuilds/$(basename $(ls out/target/product/davinci/PixelOS*.zip))")
+*Time Taken For Build*: $timefinal
+
+> [Download (Gdrive)]("$link")
 
 *Built By* [Twel12]("t.me/real_twel12")
 *Join* @CatPower12 "
 }
 
 # Generate OTA json
-function OTA() {
+function OTA(){
     echo -e "\e[36m\e[1m---------------------------Automatic OTA FULL PACKAGE UPDATE---------------------------"
-echo -e "{\"error\":false,\"maintainers\":[{\"main_maintainer\":false,\"github_username\":\"Twel12\",\"name\":\"Twel12\"}],\"donate_url\":\"\",\"website_url\":\"https://sourceforge.net/projects/pixelosdavinci/files/PixelOS_Davinci/\",\"datetime\":1608565724,\"filename\": \"$NAME\",\"id\": \"$md5\",\"size\":$FILESIZE ,\"url\":\"$DownloadLINK\",\"version\": \"eleven\",\"filehash\":\"$md5\",\"is_incremental\":false,\"has_incremental\":false}" > /home/$server/OTA/davinci.json
-cd /home/$server/OTA
-git add .
-git commit -S -m "Automatic OTA update"
-if [[ $choice_build == *"4"* ]]; then
-    git push git@github.com:PixelOS-and-Not-So-Pixel/OTA-Devices.git HEAD:eleven -f
-fi
-cd $LOCAL_PATH
-echo -e "\e[36m\e[1m---------------------------Automatic OTA Update Done---------------------------"
-}
-
-#Push Ota and Build
-function OTAandPush(){
-    SourceforgeOTA
     cd /home/$server/OTA
-    git push git@github.com:PixelOS-and-Not-So-Pixel/OTA-Devices.git HEAD:eleven -f
+    git switch $branch
+    echo -e "{\"error\":false,\"maintainers\":[{\"main_maintainer\":false,\"github_username\":\"Twel12\",\"name\":\"Twel12\"}],\"donate_url\":\"\",\"website_url\":\"https://sourceforge.net/projects/pixelosdavinci/files/PixelOS_Davinci/\",\"datetime\":$ota,\"filename\": \"$NAME\",\"id\": \"$md5\",\"size\":$FILESIZE ,\"url\":\"$DownloadLINK\",\"version\": \"eleven\",\"filehash\":\"$md5\",\"is_incremental\":false,\"has_incremental\":false}" > /home/$server/OTA/davinci.json
+    git add .
+    git commit -m "Automatic OTA update"
+    git push git@github.com:PixelOS-Pixelish/OTA-Devices.git HEAD:$branch -f
     cd $LOCAL_PATH
-    TelegramOTA
+    echo -e "\e[36m\e[1m---------------------------Automatic OTA Update Done---------------------------"
 }
 
-#Function To Read Variable for build status
+# Function To Read Variable for build status
 function buildstatus(){
-    #!/bin/bash
-filename=Variable.txt
-while read line; do
-# reading each line
-exitcodez=$line
-done < $filename
+    filename=Variable.txt
+    while read line; do
+    # reading each line
+    exitcodez=$line
+    done < $filename
 }
-
 
 # Store Some needed variables
 function Variables(){
-    Package=./out/target/product/davinci/PixelOS*.zip
-    FULLNAME=$(basename $(ls out/target/product/davinci/PixelOS*.zip))
-    ZIP_PATH=$(find ./out/target/product/davinci -maxdepth 1 -type f -name "PixelOS*.zip" | sed -n -e "1{p;q}")
+    Package=./out/target/product/davinci/Pixel*.zip
+    FULLNAME=$(basename $(ls out/target/product/davinci/Pixel*.zip))
+    ZIP_PATH=$(find ./out/target/product/davinci -maxdepth 1 -type f -name "Pixel*.zip" | sed -n -e "1{p;q}")
     NAME=$(basename $ZIP_PATH)
     FILESIZE=$(ls -al $ZIP_PATH | awk '{print $5}')
     md5=`md5sum $ZIP_PATH | awk '{ print $1 }'`
-    DownloadLINK=https://sourceforge.net/projects/pixelos-notsopixel/Pixel_OS/Davinci/"$NAME"/download
-
+    DownloadLINK=https://sourceforge.net/projects/pixelos-notsopixel/files/$path/Davinci/"$NAME"/download
+    ota=$(cat out/target/product/davinci/system/build.prop | grep org.pixelexperience.build_date_utc=)
+    ota="${ota#*=}"
 }
 
 # Push OTA , POST and Upload build
@@ -285,8 +280,8 @@ function build() {
     read -p "What Type of Build Do You Want??
 1. Test Build 
 2. Test Build (Upload)
-3. Release Build (HOLD)
-4. Release Build (PUSH)  " choice_build
+3. Release Build
+" choice_build
 
     if [[ $choice_build == *"1"* ]]; then
         read -p "Do You Want Telegram Messages
@@ -299,14 +294,12 @@ function build() {
         TelegramTestPost
     elif [[ $choice_build == *"3"* ]]; then
         echo -e "\033[01;33m\n------------------------ Starting Release Build (～￣▽￣)～------------------------ \033[0m"
-        telegram -c @CatPower12 -M "Build Compilation Started for PixelOS
+        telegram -c @CatPower12 -M "Build Compilation Started for $rom
 
-*Android Version*: 11
+*host*: $server
 *Build Type*: Release
 *Starting Time*: $(date)"
         buildbacon
-        echo "Making File For Checking OTA"
-        echo -e Henlo > IEXIST.txt # Create A File for OTA Check LATER
         Variables
         buildota
     else
@@ -331,9 +324,9 @@ read -p "" choice_script
         sync_repo
         script_error
         apply_patches patches
-        envsetup
         read -p "Do You want to Start Bacon ??(y/n)" choice_bacon
         if [[ $choice_bacon == *"y"* ]]; then
+            envsetup
             build
         else
             helloworld
@@ -344,13 +337,12 @@ read -p "" choice_script
         build
 
     elif [[ $choice_script == *"3"* ]]; then
-        FILE=IEXIST.txt
-        if test -f "$FILE"; then
-            echo "Pushing OTA"
-            OTAandPush
-            rm -rf IEXIST.txt #Remove File for next time until regenerated
+        if test -f out/target/product/davinci/$rom*.zip; then
+            echo "Build Located! for $rom"
+            Variables
+            buildota
         else
-            echo "You dont have an update repo so you cant push OTA"
+            echo "You Dont have a build READY!!!"
         fi
 
     else
@@ -360,26 +352,30 @@ read -p "" choice_script
     fi
 }
 
-# Some Check For First Times
-function firsttime() {
-    echo "Performing Some Tests before running scripts"
-if stat --printf='' /home/$server/OTA 2>/dev/null; then
-    echo "OTA Folder Check Complete."
-else
-    echo -e "\033[01;31m\n Failed Finding OTA Folder \n "
-    echo "Cloning OTA Folder"
-    git clone https://github.com/PixelOS-and-Not-So-Pixel/OTA-Devices /home/$server/OTA
-fi
-
-if stat --printf='' /home/$server/telegram.sh 2>/dev/null; then
-    echo "telegram script check complete"
-else
-    echo -e "\033[01;31m\n Failed Finding Telegram Folder 033[0m"
-    git clone https://github.com/Twel12/telegram.sh /home/$server/telegram.sh
-fi
-
+function start(){
+    read -p "Choose Branch of ROM
+1.PixelOS
+2.Pixelish
+" rom
+    if [[ $rom == "1" ]];then
+        rom=PixelOS
+        branch=eleven
+        path=Pixel_OS
+    elif [[ $rom == "2" ]];then
+        rom=PixelishExperience
+        branch=eleven-plus
+        path=Pixelish
+    else
+        echo "Enter Valid Choice"
+        exit
+    fi
+        helloworld
 }
-
 firsttime
-helloworld
+start
 echo -e "\e[36m\e[1m---------------------------See Ya Later :P---------------------------"
+
+# Turn off VM if host is not twel12 as twel12 is my local build system
+if [[ $USER != 'twel12' ]];then
+    sudo poweroff
+fi

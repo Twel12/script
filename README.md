@@ -1,4 +1,4 @@
-# PixelOS build_scripts for davinci
+# build script for davinci
 
 ## Usage:
 ```bash
@@ -27,3 +27,6 @@ https://github.com/Twel12/proprietary_vendor_xiaomi_davinci
 
 ## Repo I use for telegram Commands:
 https://github.com/fabianonline/telegram.sh
+
+## Repo I use for Gdrive Commands:
+https://github.com/usmanmughalji/gdriveupload

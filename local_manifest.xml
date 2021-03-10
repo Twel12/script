@@ -6,7 +6,7 @@
 <project path="kernel/xiaomi/sm6150" name="android_kernel_xiaomi_sm6150" remote="Twel12" revision="eleven" />
 
 <!-- OSS vendor -->
-<project path="vendor/xiaomi/davinci" name="proprietary_vendor_xiaomi_davinci" remote="Twel12" revision="eleven" />
+<project path="vendor/xiaomi/davinci" name="vendor-xiaomi-davinci" remote="Twel12" revision="eleven" />
 
 <!-- Track Hardware Stuff -->
 <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="Twel12" revision="lineage-18.0" />
@@ -16,13 +16,4 @@
   
 <!-- davinci device tree -->
 <project path="device/xiaomi/davinci" name="device-xiaomi-davinci" remote="Twel12" revision="eleven" />
-
-<!--Track Hals From My Repo-->
-<remove-project name="hardware_qcom-caf_sm8150_audio" />
-<project name="hardware-qcom-caf-sm8150-audio" path="hardware/qcom-caf/sm8150/audio" remote="Twel12" revision="lineage-18.0-caf-sm8150" />
-<remove-project name="hardware_qcom-caf_sm8150_display" />
-<project name="hardware-qcom-caf-sm8150-display" path="hardware/qcom-caf/sm8150/display" remote="Twel12" revision="lineage-18.0-caf-sm8150" />
-<remove-project name="hardware_qcom-caf_sm8150_media" />
-<project name="hardware-qcom-caf-sm8150-media" path="hardware/qcom-caf/sm8150/media" remote="Twel12" revision="master" />
-
 </manifest>
