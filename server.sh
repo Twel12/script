@@ -26,7 +26,8 @@ function firsttime() {
         echo "telegram script check complete"
     else
         echo -e "\033[01;31m\n Failed Finding Telegram Folder 033[0m"
-        git clone https://github.com/Twel12/telegram.sh /home/$server/telegram.sh
+        git clone git@github.com:Twel12/telegram.sh.git /home/$server/telegram.sh
+
     fi
 }
 
@@ -89,7 +90,7 @@ function init_main_repo() {
 # Start Sycing Repo
 function sync_repo() {
     echo -e "\033[01;33m\nSync fetch repo... \033[0m"
-    repo sync -c -q --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j$(nproc --all) #SAVETIME
+    repo sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j$(nproc --all) #SAVETIME
 }
 
 # Apply Patches (by @Raysenlau)
@@ -212,7 +213,8 @@ function TelegramOTA() {
 *By* [Twel12]("t.me/real_twel12")
 *Follow* @RedmiK20Updates
 *Join* @RedmiK20GlobalOfficial"
-telegram -c @CatPower12 -M "Builds take _15-20_ mins To Appear As Sourceforge is slow, Please be *patient*."
+sleep 5s #Make sure posted before msg
+telegram -c @CatPower12 -M "Builds take _15-20_ mins to appear on sourceforge and ota + changelog might also take 5-10 mins, Please be *patient*."
 echo -e "\033[01;31m\n--------------------- Post Created ^_^ ---------------------\033[0m"
 }
 
@@ -223,10 +225,10 @@ bash ~/telegram.sh/telegram -c -1001349538519 -M "#$rom #Android11 #Davinci #Tes
 *$rom | Android 11*
 UPDATE DATE - $update_date
 
+> [Download (Gdrive)]("$link")
+
 *This is a Test Build*
 *Time Taken For Build*: $timefinal
-
-> [Download (Gdrive)]("$link")
 
 *Built By* [Twel12]("t.me/real_twel12")
 *Join* @CatPower12 "
@@ -236,6 +238,8 @@ UPDATE DATE - $update_date
 function OTA(){
     echo -e "\e[36m\e[1m---------------------------Automatic OTA FULL PACKAGE UPDATE---------------------------"
     cd /home/$server/OTA
+    git add .
+    git commit -m "SAVE CHANGES IF ANY"
     git switch $branch
     echo -e "{\"error\":false,\"maintainers\":[{\"main_maintainer\":false,\"github_username\":\"Twel12\",\"name\":\"Twel12\"}],\"donate_url\":\"\",\"website_url\":\"https://sourceforge.net/projects/pixelosdavinci/files/PixelOS_Davinci/\",\"datetime\":$ota,\"filename\": \"$NAME\",\"id\": \"$md5\",\"size\":$FILESIZE ,\"url\":\"$DownloadLINK\",\"version\": \"eleven\",\"filehash\":\"$md5\",\"is_incremental\":false,\"has_incremental\":false}" > /home/$server/OTA/davinci.json
     git add .
@@ -263,13 +267,13 @@ function Variables(){
     FILESIZE=$(ls -al $ZIP_PATH | awk '{print $5}')
     md5=`md5sum $ZIP_PATH | awk '{ print $1 }'`
     DownloadLINK=https://sourceforge.net/projects/pixelos-notsopixel/files/$path/Davinci/"$NAME"/download
-    ota=$(cat out/target/product/davinci/system/build.prop | grep org.pixelexperience.build_date_utc=)
+    ota=$(cat out/target/product/davinci/system/build.prop | grep ro.system.build.date.utc=)
     ota="${ota#*=}"
 }
 
 # Push OTA , POST and Upload build
 function buildota() {
-echo -e "\033[01;33m\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ \033[0m"
+echo -e "\033[01;33m\n---------------------------------------------------------------------------------- \033[0m"
     SourceforgeOTA
     TelegramOTA
     OTA
