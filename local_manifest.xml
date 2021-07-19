@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 <remote name="Twel12" fetch="https://github.com/Twel12/" />
+<remote name="github" fetch="https://github.com/" />
 
-<!-- kernel -->
-<project path="kernel/xiaomi/sm6150" name="android_kernel_xiaomi_sm6150" remote="Twel12" revision="eleven" />
+<!-- Kernel -->
+<project path="kernel/xiaomi/sm6150" name="kernel_xiaomi_sm6150" remote="Twel12" revision="android11-newdoze"/>
 
 <!-- OSS vendor -->
 <project path="vendor/xiaomi/davinci" name="vendor-xiaomi-davinci" remote="Twel12" revision="eleven" />
@@ -14,6 +15,9 @@
 <!-- Davinci patches for PixelOS -->
 <project path="patches" name="build_patches" remote="Twel12" revision="eleven" />
   
-<!-- davinci device tree -->
+<!-- Davinci device tree -->
 <project path="device/xiaomi/davinci" name="device-xiaomi-davinci" remote="Twel12" revision="eleven" />
+
+<!-- Proton Clang -->
+<project path="prebuilts/clang/host/linux-x86/clang-proton" name="kdrag0n/proton-clang" remote="github" revision="master" />
 </manifest>
