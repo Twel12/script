@@ -12,7 +12,7 @@
 <!-- Track Hardware Stuff -->
 <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="Twel12" revision="lineage-18.0" />
 
-<!-- Davinci patches for PixelOS -->
+<!-- Device Side patches for PixelOS -->
 <project path="patches" name="build_patches" remote="Twel12" revision="eleven" />
   
 <!-- Davinci device tree -->

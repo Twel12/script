@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+<remote name="Twel12" fetch="https://github.com/Twel12/" />
+<remote name="github" fetch="https://github.com/" />
+
+<!-- Kernel -->
+<project path="kernel/xiaomi/sweet" name="kernel_xiaomi_sweet" remote="Twel12" revision="lineage-18.1"/>
+
+<!-- OSS vendor -->
+<project path="vendor/xiaomi/sweet" name="vendor_xiaomi_sweet" remote="Twel12" revision="lineage-18.1" />
+
+<!-- Track Hardware Stuff -->
+<project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="Twel12" revision="lineage-18.0" />
+
+<!--Device Side patches for PixelOS -->
+<project path="patches" name="build_patches" remote="Twel12" revision="eleven" />
+
+<!-- Sweet device tree -->
+<project path="device/xiaomi/sweet" name="device_xiaomi_sweet" remote="Twel12" revision="eleven" />
+</manifest>
