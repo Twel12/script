@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+
+    <!-- Device trees -->
+    <project name="PixelOS-ginkgo/device_xiaomi_ginkgo" path="device/xiaomi/ginkgo" remote="github" revision="eleven" />
+
+    <!-- Vendor trees -->
+    <project name="PixelOS-ginkgo/vendor_xiaomi_ginkgo" path="vendor/xiaomi/ginkgo" remote="github" revision="eleven" />
+    <project name="whyredfire/android_vendor_miuicamera" path="vendor/miuicamera" remote="github" revision="eleven" />
+
+    <!-- Kernel tree and clang -->
+    <project name="ghostrider-reborn/android_kernel_xiaomi_ginkgo" path="kernel/xiaomi/ginkgo" remote="github" revision="11.0" clone-depth="1" />
+    <project name="ThankYouMario/proprietary_vendor_qcom_sdclang" path="prebuilts/clang/host/linux-x86/clang-sdllvm" remote="github" revision="ruby-12" clone-depth="1" />
+
+    <!-- Needed custom HALs -->
+    <remove-project name="hardware_qcom-caf_sm8150_audio" />
+    <remove-project name="hardware_qcom-caf_sm8150_display" />
+    <remove-project name="hardware_qcom-caf_sm8150_media" />
+    <remove-project name="android_vendor_qcom_opensource_display-commonsys-intf" />
+    <remove-project name="vendor_qcom_opensource_power" />
+    <project path="hardware/qcom-caf/sm8150/audio" name="ArrowOS/android_hardware_qcom_audio" groups="qcom,qcom_audio" remote="github" revision="arrow-11.0-caf-sm8150" />
+    <project path="hardware/qcom-caf/sm8150/display" name="ArrowOS/android_hardware_qcom_display" groups="pdk,qcom,qcom_display" remote="github" revision="arrow-11.0-caf-sm8150" />
+    <project path="hardware/qcom-caf/sm8150/media" name="ArrowOS/android_hardware_qcom_media" groups="qcom" remote="github" revision="arrow-11.0-caf-sm8150" />
+    <project path="vendor/qcom/opensource/commonsys-intf/display" name="ArrowOS/android_vendor_qcom_opensource_display-commonsys-intf" remote="github" revision="arrow-11.0" />
+    <project path="vendor/qcom/opensource/power" name="ArrowOS/android_vendor_qcom_opensource_power" remote="github" revision="arrow-11.0" />
+   
+</manifest>

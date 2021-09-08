@@ -21,7 +21,7 @@ https://github.com/fabianonline/telegram.sh
 
 ## Repo I use for Gdrive Commands:
 ```bash
-https://github.com/usmanmughalji/gdriveupload
+https://formulae.brew.sh/formula/gdrive
 ```
 
  ## CREDITS to @Raysenlau for initial script and also to @Ariank16a for OTA portion ideas you can check their scripts below
