@@ -29,8 +29,10 @@ function Check_OTA() {
 
 #To check if  Changelog Exists for release build or not
 function CheckChangelog(){
-    if stat --printf='' $LOCAL_PATH/$codename.txt 2>/dev/null; then
-        export changelog=$(<$codename.txt)
+    FILE=$LOCAL_PATH/$codename.txt
+    if test -f "$FILE"; then
+        echo "$FILE exists."
+        export changelog=$(<hi.txt)
     else
         echo "Enter Valid Changelog for $codename under the name $codename.txt"
         exit
@@ -87,17 +89,6 @@ function buildstatus(){
     done < $filename
 }
 
-# start build and store time taken
-function buildbacon() {
-    buildstart=$(date +"%s")
-    startbuild 2>&1 | tee log.txt
-    buildstatus
-    buildend=$(date +"%s")
-    buildtime=$(($buildend - $buildstart))
-    timefinal=$(timechange "$buildtime")
-    build_error
-}
-
 # Initialize Pixel OS repository
 function init_main_repo() {
     echo -e "\033[01;33m\nInit main repo... \033[0m"
@@ -108,7 +99,7 @@ function init_main_repo() {
 function init_local_repo() {
     echo -e "\033[01;33m\nCopy local manifest.xml... \033[0m"
     mkdir -p .repo/local_manifests
-    cp "$(dirname "$0")/local_$codename.xml" .repo/local_manifests/default.xml
+    cp "$(dirname "$0")/Devices/$devicename/local_$codename.xml" .repo/local_manifests/default.xml
 }
 
 # Start Sycing Repo
@@ -208,7 +199,7 @@ function OTA_UPLOAD() {
 # Upload Test Build
 function TelegramTestPost() {
     Gdrive
-bash telegram -c -1001349538519 -M "#$rom #Android11 #$devicename #TestBuild
+    telegram -c -1001349538519 -M "#$rom #Android11 #$devicename #TestBuild
 *$rom | Android 11*
 UPDATE DATE - $update_date
 
@@ -234,6 +225,9 @@ function testbuild(){
         telegram -c "-1001535319438" -M "Test Build Successfully Completed for $rom
 
 *Time Taken For Build*: $timefinal"
+    if [[ $choice_build == *"2"* ]];then
+        TelegramTestPost
+    fi
 }
 
 # Store Some Variables needed for OTA
@@ -253,7 +247,7 @@ function OTA(){
     echo -e "\e[36m\e[1m---------------------------Automatic OTA FULL PACKAGE UPDATE---------------------------"
     cd /home/$server/OTA
     git fetch origin
-    git checkout origin
+    git checkout origin/$branch
     git switch $branch
     echo -e $changelog > /home/$server/OTA/$change
     echo -e "{
@@ -273,19 +267,21 @@ function OTA(){
     }" > /home/$server/OTA/$codename.json
     git add .
     git commit -m "Automatic OTA update"
-    git push git@github.com:PixelOS-Pixelish/OTA-Devices.git HEAD:$branch -f
+    git push git@github.com:PixelOS-Pixelish/OTA-Devices.git HEAD:$branch
+    echo "Moving Changelog to the path $LOCAL_PATH/$codename-old.txt "
+    mv $LOCAL_PATH/$codename.txt $LOCAL_PATH/$codename-old.txt
     cd $LOCAL_PATH
     echo -e "\e[36m\e[1m---------------------------Automatic OTA Update Done---------------------------"
 }
 
 # Make Post for Release build
 function TelegramOTA() {
-    bash ~/telegram.sh/telegram -i ~/telegram.sh/$rom.jpg -c @fake_twel12 -M "#$rom #Android11 #$devicename #OTAUpdate
+    telegram -i $image -c @fake_twel12 -M "#$rom #Android11 #$devicename #OTAUpdate
 *$rom - OFFICIAL | Android 11.*
 *Updated:* _ $update_date  _
 
 ▪️ [Download]("$GithubLINK") | [Gdrive]("$link") | [SF]("$SourceforgeLINK")
-▪️ [Changelog](https://raw.githubusercontent.com/PixelOS-Pixelish/OTA-Devices/$branch/$change.txt)
+▪️ [Changelog](https://raw.githubusercontent.com/PixelOS-Pixelish/OTA-Devices/$branch/$change)
 ▪️ [Support]($group)
 
 *By* $maintainer
@@ -311,13 +307,10 @@ function build() {
     2. Test Build (Upload)
     3. Release Build
     " choice_build
-    if [[ $choice_build == *"1"* ]]; then
+    if [[ $choice_build == *"1"* || $choice_build == *"2"* ]];then
         echo -e "\033[01;33m\n---------------------------Starting Test Build (*^_^*)--------------------------- \033[0m"
         testbuild
-    elif [[ $choice_build == *"2"* ]]; then
-        testbuild
-        TelegramTestPost
-    elif [[ $choice_build == *"3"* ]]; then
+    elif [[ $choice_build == *"3"* ]];then
         CheckChangelog
         echo -e "\033[01;33m\n------------------------ Starting Release Build (～￣▽￣)～------------------------ \033[0m"
         telegram -c @CatPower12 -M "Build Compilation Started for $rom
@@ -390,7 +383,7 @@ function Select(){
         codename=davinci
         devicename=Davinci
         Follow=@RedmiK20Updates
-        Join=RedmiK20GlobalOfficial
+        Join=@RedmiK20GlobalOfficial
         change=davinci_changelogs.txt
         maintainer='[Twel12]("t.me/real_twel12")'
         group=t.me/CatPower12
@@ -425,21 +418,25 @@ function ROM(){
         rom=PixelOS
         branch=eleven
         path=Pixel_OS
+        image=$(dirname "$0")/Devices/$devicename/PixelOS.png
+
     elif [[ $rom == "2" ]];then
         rom=PixelishExperience
         branch=eleven-plus
         path=Pixelish
+        image=$(dirname "$0")/Devices/PixelishExperience.jpg
+
     else
         echo "Enter Valid Choice"
         exit
     fi
-        BuildOption
 }
 
 #Initialize Script
 Check_OTA
 Select
 ROM
+BuildOption
 echo -e "\e[36m\e[1m---------------------------See Ya Later :P---------------------------"
 
 # Turn off VM if host is not twel12 as twel12 is my local build system
