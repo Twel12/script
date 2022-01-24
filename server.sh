@@ -15,6 +15,15 @@ LOCAL_PATH="$(pwd)"
 
 echo -e "\e[36m\e[1m--------------------------- Just Another Script ---------------------------"
 
+#Clone script support repo for devices
+function script_support(){
+    git clone git@github.com:twel12/Script_Support $LOCAL_PATH/Devices
+    cd $LOCAL_PATH/Devices
+    git fetch origin
+    git checkout origin
+    cd $LOCAL_PATH
+}
+
 # Some Check Regarding OTA and telegram repo
 function Check_OTA() {
     echo "Performing Some Tests before running scripts"
@@ -150,8 +159,11 @@ function apply_patches() {
 function envsetup() {
     echo -e "\033[01;33m\n---------------- Setting up build environment ---------------- \033[0m"
     ccache -M 75G
+    sudo mkdir /mnt/ccache
+    sudo mount --bind ~/.ccache /mnt/ccache
     export USE_CCACHE=1
-    export CCACHE_EXEC=$(command -v ccache)
+    export CCACHE_EXEC=/usr/bin/ccache
+    export CCACHE_DIR=/mnt/ccache
     export CUSTOM_BUILD_TYPE=OFFICIAL
     . build/envsetup.sh
     lunch aosp_$codename-user
@@ -199,7 +211,7 @@ function OTA_UPLOAD() {
 # Upload Test Build
 function TelegramTestPost() {
     Gdrive
-    telegram -c -1001349538519 -M "#$rom #Android11 #$devicename #TestBuild
+    telegram -c -1001349538519 -M "#$rom #$AndroidVersion #$devicename #TestBuild
 *$rom | Android 11*
 UPDATE DATE - $update_date
 
@@ -276,7 +288,7 @@ function OTA(){
 
 # Make Post for Release build
 function TelegramOTA() {
-    telegram -i $image -c @fake_twel12 -M "#$rom #Android11 #$devicename #OTAUpdate
+    telegram -i $image -c @fake_twel12 -M "#$rom #$AndroidVersion #$devicename #OTAUpdate
 *$rom - OFFICIAL | Android 11.*
 *Updated:* _ $update_date  _
 
@@ -372,43 +384,6 @@ read -p "" choice_script
     fi
 }
 
-function Select(){
-    echo -e "\033[01;33m\nSelect Device to Build For
-        1. Davinci
-        2. Sweet
-        3. Ginkgo"
-    read -p "" device
-    # Store Device Specefic Variables Ik Gay But Yes
-    if [[ $device == "1" ]];then
-        codename=davinci
-        devicename=Davinci
-        Follow=@RedmiK20Updates
-        Join=@RedmiK20GlobalOfficial
-        change=davinci_changelogs.txt
-        maintainer='[Twel12]("t.me/real_twel12")'
-        group=t.me/CatPower12
-    elif [[ $device == "2" ]];then
-        codename=sweet
-        devicename=Sweet
-        Follow=@RedmiNote10ProChannel
-        Join=@RedmiNote10ProDiscussion
-        change=sweet_changelogs.txt
-        maintainer='[Twel12]("t.me/real_twel12")'
-        group=t.me/CatPower12
-    elif [[ $device == "3" ]];then
-        codename=ginkgo
-        devicename=Ginkgo
-        Follow=@GinkgoUpdates
-        Join=@GinkgoOfficial
-        change=ginkgo_changelogs.txt
-        maintainer=@whyredfire
-        group=t.me/whyredfire
-    else
-        echo "Wrong Device Chosen"
-        exit
-    fi
-}
-
 function ROM(){
     read -p "Choose Branch of ROM
 1.PixelOS
@@ -433,8 +408,9 @@ function ROM(){
 }
 
 #Initialize Script
+script_support
 Check_OTA
-Select
+bash "$(dirname "$0")/Devices/Device.sh" #Export Devices
 ROM
 BuildOption
 echo -e "\e[36m\e[1m---------------------------See Ya Later :P---------------------------"
